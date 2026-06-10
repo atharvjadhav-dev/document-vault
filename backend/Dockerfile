@@ -23,7 +23,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --chown=nodeuser:nodejs . .
 
 # Create uploads directory with correct permissions
-RUN mkdir -p /app/uploads && chown -R nodeuser:nodejs /app/uploads
+RUN mkdir -p /app/uploads /app/logs && \
+    chown -R nodeuser:nodejs /app/uploads /app/logs
 
 USER nodeuser
 
