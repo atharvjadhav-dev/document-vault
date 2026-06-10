@@ -41,7 +41,7 @@ const App = () => {
                 <Route path="/upload"    element={<UploadPage />} />
                 <Route path="/profile"   element={<ProfilePage />} />
                 {/* Redirect /app root to dashboard */}
-                <Route index            element={<Navigate to="/dashboard" replace />} />
+                <Route path="/app"       element={<Navigate to="/dashboard" replace />} />
               </Route>
 
               {/* 404 */}
