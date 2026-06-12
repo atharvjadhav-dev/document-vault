@@ -60,21 +60,23 @@ export const documentsApi = {
 
   getDownloadUrl: (id) => `${API_URL}/documents/download/${id}`,
 
-  download: async (id, filename) => {
+  download: async (id) => {
     const token = localStorage.getItem('vault_token');
+
     const response = await fetch(`${API_URL}/documents/download/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error('Download failed');
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      redirect: 'manual',
+    } );
+
+    const downloadUrl = response.headers.get('Location');
+
+    if (!downloadUrl) {
+      throw new Error('Download URL not received');
+    }
+
+    window.open(downloadUrl, '_blank');
   },
 };
 
