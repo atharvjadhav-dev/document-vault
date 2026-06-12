@@ -61,22 +61,9 @@ export const documentsApi = {
   getDownloadUrl: (id) => `${API_URL}/documents/download/${id}`,
 
   download: async (id) => {
-    const token = localStorage.getItem('vault_token');
+    const response = await api.get(`/documents/${id}/download-url`);
 
-    const response = await fetch(`${API_URL}/documents/download/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      redirect: 'manual',
-    } );
-
-    const downloadUrl = response.headers.get('Location');
-
-    if (!downloadUrl) {
-      throw new Error('Download URL not received');
-    }
-
-    window.open(downloadUrl, '_blank');
+    window.open(response.data.downloadUrl, '_blank');
   },
 };
 

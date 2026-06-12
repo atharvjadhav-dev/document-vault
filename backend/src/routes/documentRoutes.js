@@ -7,6 +7,7 @@ const {
   deleteDocument,
   downloadDocument,
   getStats,
+  getDownloadUrl,
 } = require('../controllers/documentController');
 const { authenticate } = require('../middleware/authMiddleware');
 const { uploadSingle } = require('../middleware/uploadMiddleware');
@@ -26,6 +27,7 @@ router.use(authenticate);
 // to avoid Express treating "stats" and "download" as UUID params
 
 router.get('/stats',          getStats);
+router.get('/:id/download-url', authenticate, getDownloadUrl);
 router.get('/download/:id',   validateDocumentId, downloadDocument);
 
 router.get('/',               validateSearch,      getDocuments);

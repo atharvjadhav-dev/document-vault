@@ -193,6 +193,30 @@ const getStats = async (req, res, next) => {
   }
 };
 
+const getDownloadUrl = async (req, res, next) => {
+  try {
+    const document = await DocumentModel.findByIdAndUser(
+      req.params.id,
+      req.user.id
+    );
+
+    if (!document) {
+      return sendError(res, 'Document not found.', 404);
+    }
+
+    const downloadUrl = await storageService.getDownloadPath(
+      document.file_path
+    );
+
+    return res.json({
+      success: true,
+      downloadUrl,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getDocuments,
   uploadDocument,
@@ -201,4 +225,5 @@ module.exports = {
   deleteDocument,
   downloadDocument,
   getStats,
+  getDownloadUrl,
 };
