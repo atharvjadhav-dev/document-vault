@@ -10,9 +10,21 @@
 const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} = require('@aws-sdk/client-s3');
+
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 const STORAGE_TYPE = process.env.STORAGE_TYPE || 'local';
 const UPLOAD_PATH = process.env.UPLOAD_PATH || './uploads';
+const s3 =
+  STORAGE_TYPE === 's3'
+    ? new S3Client({ region: process.env.AWS_REGION })
+    : null;
 
 // Ensure upload directory exists (local storage)
 if (STORAGE_TYPE === 'local') {
@@ -98,10 +110,8 @@ class StorageService {
   // ── AWS S3 Storage ─────────────────────────────────────────────────────────
   // Uncomment and install: npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 
-  /*
+  
   async _saveToS3(file, userId) {
-    const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-    const s3 = new S3Client({ region: process.env.AWS_REGION });
 
     const key = `uploads/${userId}/${file.filename}`;
     const fileBuffer = fs.readFileSync(file.path);
@@ -124,8 +134,6 @@ class StorageService {
   }
 
   async _deleteFromS3(s3Key) {
-    const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-    const s3 = new S3Client({ region: process.env.AWS_REGION });
 
     await s3.send(new DeleteObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
@@ -136,9 +144,6 @@ class StorageService {
   }
 
   async _getS3SignedUrl(s3Key) {
-    const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-    const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-    const s3 = new S3Client({ region: process.env.AWS_REGION });
 
     return getSignedUrl(
       s3,
@@ -146,7 +151,6 @@ class StorageService {
       { expiresIn: 3600 }   // 1 hour signed URL
     );
   }
-  */
 }
 
 module.exports = new StorageService();
