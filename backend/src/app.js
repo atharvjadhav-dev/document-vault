@@ -11,6 +11,7 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorMiddleware'
 const logger = require('./utils/logger');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ── Security Headers ──────────────────────────────────────────────────────────
 app.use(helmet({
