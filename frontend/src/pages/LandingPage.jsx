@@ -60,8 +60,8 @@ const FEATURES = [
           d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
       </svg>
     ),
-    title: 'Cloud Ready',
-    description: 'Built to migrate to AWS S3, RDS, and Cognito without changing a single line of logic.',
+    title: 'Access Anywhere',
+    description: 'Your documents are available whenever you need them from any device.'
   },
 ];
 
@@ -125,13 +125,13 @@ const LandingPage = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight mb-6 text-balance">
-            Your documents.{' '}
-            <span className="gradient-text">Secured.</span>
+            Store Your Important Documents
+            <span className="gradient-text"> Securely</span>
           </h1>
 
           <p className="text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            A production-grade personal document vault — upload, organise, and access your Aadhaar,
-            PAN, Passport, certificates and more, all in one secure place.
+            Upload, organize, and access your important documents from anywhere.
+            Keep certificates, IDs, resumes, and personal records secure in one place.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -148,7 +148,7 @@ const LandingPage = () => {
 
           {/* Trust row */}
           <div className="flex flex-wrap items-center justify-center gap-6 mt-12 text-xs text-slate-400 dark:text-slate-500">
-            {['JWT Auth', 'bcrypt Passwords', 'Rate Limited', 'SQL Injection Protection', 'Open Source'].map((t) => (
+            {['JWT Auth', 'bcrypt Passwords', 'Rate Limited', 'SQL Injection Protection', 'Fast Uploads'].map((t) => (
               <span key={t} className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

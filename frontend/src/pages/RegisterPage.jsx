@@ -106,15 +106,20 @@ const RegisterPage = () => {
                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h2 className="text-3xl font-bold mb-3">Create Your Vault</h2>
+          <h2 className="text-3xl font-bold mb-3">
+            Your Documents.
+            <br />
+            Always Protected.
+          </h2>
           <p className="text-vault-200 leading-relaxed">
-            Join thousands who trust Document Vault to store their most important files securely.
+            Store certificates, IDs, resumes, and personal records securely in one place.
           </p>
           <div className="mt-10 space-y-3 text-left">
             {[
-              ['Free to use', 'No credit card required'],
-              ['Secure by default', 'bcrypt + JWT authentication'],
-              ['AWS-ready', 'Easy S3 migration when you need it'],
+              ['Secure cloud storage', 'Your documents stay protected'],
+              ['Access from anywhere', 'Available whenever you need them'],
+              ['Fast uploads and downloads', 'Quick and reliable access'],
+              ['Private by design', 'Only you can access your files'],
             ].map(([title, sub]) => (
               <div key={title} className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
                 <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
