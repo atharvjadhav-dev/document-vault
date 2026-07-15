@@ -155,7 +155,10 @@ const downloadDocument = async (req, res, next) => {
       return sendError(res, 'Document not found.', 404);
     }
 
-    const downloadPath = await storageService.getDownloadPath(document.file_path);
+    const downloadPath = await storageService.getDownloadPath(
+      document.file_path,
+      document.original_filename
+    );
 
     // Set headers for download
     res.setHeader(
@@ -204,9 +207,20 @@ const getDownloadUrl = async (req, res, next) => {
       return sendError(res, 'Document not found.', 404);
     }
 
-    const downloadUrl = await storageService.getDownloadPath(
-      document.file_path
+    const downloadPath = await storageService.getDownloadPath(
+      document.file_path,
+      document.original_filename
     );
+
+    let downloadUrl = downloadPath;
+    if (process.env.STORAGE_TYPE !== 's3') {
+      const authHeader = req.headers.authorization;
+      const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : '';
+
+      const host = req.get('host');
+      const protocol = req.protocol;
+      downloadUrl = `${protocol}://${host}/api/documents/download/${document.id}?token=${encodeURIComponent(token)}`;
+    }
 
     return res.json({
       success: true,

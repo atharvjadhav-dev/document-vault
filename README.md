@@ -30,7 +30,7 @@ Document Vault is a secure, cloud-ready document storage platform where users ca
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        DOCKER COMPOSE                        │
+│                        DOCKER COMPOSE                       
 │  ┌──────────────┐   ┌──────────────┐   ┌────────────────┐  │
 │  │   Frontend   │   │   Backend    │   │  PostgreSQL DB │  │
 │  │  React+Vite  │──▶│  Express.js  │──▶│                │  │

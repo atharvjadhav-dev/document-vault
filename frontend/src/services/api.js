@@ -63,7 +63,7 @@ export const documentsApi = {
   download: async (id) => {
     const response = await api.get(`/documents/${id}/download-url`);
 
-    window.open(response.data.downloadUrl, '_blank');
+    window.location.href = response.data.downloadUrl;
   },
 };
 

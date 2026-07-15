@@ -8,16 +8,17 @@ const logger = require('../utils/logger');
  */
 const authenticate = async (req, res, next) => {
   try {
+    let token;
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return sendError(res, 'Authentication required. Please provide a valid token.', 401);
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else if (req.query.token) {
+      token = req.query.token;
     }
 
-    const token = authHeader.split(' ')[1];
-
     if (!token) {
-      return sendError(res, 'Authentication token missing.', 401);
+      return sendError(res, 'Authentication required. Please provide a valid token.', 401);
     }
 
     // Verify token

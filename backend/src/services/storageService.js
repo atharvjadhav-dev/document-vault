@@ -63,11 +63,12 @@ class StorageService {
   /**
    * Get an absolute path / signed URL for file download.
    * @param {string} filePath - Stored path
+   * @param {string} [originalFilename] - Original filename for the download header
    * @returns {Promise<string>}
    */
-  async getDownloadPath(filePath) {
+  async getDownloadPath(filePath, originalFilename) {
     if (STORAGE_TYPE === 's3') {
-      return this._getS3SignedUrl(filePath);
+      return this._getS3SignedUrl(filePath, originalFilename);
     }
     return path.resolve(filePath);
   }
@@ -143,11 +144,21 @@ class StorageService {
     logger.info('File deleted from S3', { s3Key });
   }
 
-  async _getS3SignedUrl(s3Key) {
+  async _getS3SignedUrl(s3Key, originalFilename) {
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: s3Key,
+    };
+
+    if (originalFilename) {
+      params.ResponseContentDisposition = `attachment; filename="${encodeURIComponent(originalFilename)}"`;
+    } else {
+      params.ResponseContentDisposition = 'attachment';
+    }
 
     return getSignedUrl(
       s3,
-      new GetObjectCommand({ Bucket: process.env.AWS_BUCKET_NAME, Key: s3Key }),
+      new GetObjectCommand(params),
       { expiresIn: 3600 }   // 1 hour signed URL
     );
   }
