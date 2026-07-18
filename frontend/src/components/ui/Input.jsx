@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 const Input = React.forwardRef(({
   label,
+  id,
+  name,
   error,
   hint,
   className = '',
@@ -9,9 +11,17 @@ const Input = React.forwardRef(({
   rightIcon,
   ...props
 }, ref) => {
+  const generatedId = useId();
+  const inputId = id || generatedId;
+  const inputName = name || props.type || generatedId;
+
   return (
     <div className="w-full">
-      {label && <label className="label">{label}</label>}
+      {label && (
+        <label htmlFor={inputId} className="label">
+          {label}
+        </label>
+      )}
       <div className="relative">
         {leftIcon && (
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -20,6 +30,8 @@ const Input = React.forwardRef(({
         )}
         <input
           ref={ref}
+          id={inputId}
+          name={inputName}
           className={`input ${leftIcon ? 'pl-10' : ''} ${rightIcon ? 'pr-10' : ''} ${error ? 'input-error' : ''} ${className}`}
           {...props}
         />

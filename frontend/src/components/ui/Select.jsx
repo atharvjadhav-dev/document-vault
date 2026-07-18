@@ -1,18 +1,30 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 const Select = React.forwardRef(({
   label,
+  id,
+  name,
   error,
   options = [],
   placeholder,
   className = '',
   ...props
 }, ref) => {
+  const generatedId = useId();
+  const selectId = id || generatedId;
+  const selectName = name || generatedId;
+
   return (
     <div className="w-full">
-      {label && <label className="label">{label}</label>}
+      {label && (
+        <label htmlFor={selectId} className="label">
+          {label}
+        </label>
+      )}
       <select
         ref={ref}
+        id={selectId}
+        name={selectName}
         className={`input ${error ? 'input-error' : ''} ${className}`}
         {...props}
       >

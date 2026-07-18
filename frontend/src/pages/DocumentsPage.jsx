@@ -114,6 +114,9 @@ const DocumentsPage = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
+            id="search-documents"
+            name="search"
+            aria-label="Search documents"
             type="search"
             placeholder="Search documents…"
             value={searchRaw}
@@ -124,6 +127,9 @@ const DocumentsPage = () => {
 
         {/* Category filter */}
         <select
+          id="category-filter"
+          name="category"
+          aria-label="Filter documents by category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="input sm:w-48"
