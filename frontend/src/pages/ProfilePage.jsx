@@ -60,7 +60,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Avatar + name card */}
-      <div className="card p-6">
+      <div className="rounded-2xl p-5 sm:p-6 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
         <div className="flex items-center gap-5">
           {/* Avatar */}
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-vault-400 to-vault-700 flex items-center justify-center text-white text-2xl font-bold shadow-vault flex-shrink-0">
@@ -78,7 +78,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Account details */}
-      <div className="card p-6">
+      <div className="rounded-2xl p-5 sm:p-6 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
         <h3 className="font-semibold text-slate-900 dark:text-white mb-3">Account Details</h3>
         <InfoRow label="Full Name"   value={user?.fullName || '—'} />
         <InfoRow label="Email"       value={user?.email || '—'} />
@@ -87,7 +87,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Storage stats */}
-      <div className="card p-6">
+      <div className="rounded-2xl p-5 sm:p-6 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
         <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Storage Summary</h3>
         {loading ? (
           <div className="space-y-3 animate-pulse">
@@ -105,7 +105,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Preferences */}
-      <div className="card p-6">
+      <div className="rounded-2xl p-5 sm:p-6 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
         <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Preferences</h3>
         <div className="flex items-center justify-between py-2">
           <div>
@@ -145,7 +145,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Danger zone */}
-      <div className="card p-6 border-red-100 dark:border-red-900/40">
+      <div className="rounded-2xl p-5 sm:p-6 border-0 sm:border border-red-100 sm:dark:border-red-900/40 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
         <h3 className="font-semibold text-red-600 dark:text-red-400 mb-1">Sign Out</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
           You will need to log in again to access your vault.

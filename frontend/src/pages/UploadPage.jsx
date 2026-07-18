@@ -98,7 +98,7 @@ const UploadPage = () => {
         </p>
       </div>
 
-      <div className="card p-6 space-y-6">
+      <div className="rounded-2xl p-5 sm:p-6 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card space-y-6">
         {/* Drop zone */}
         <div>
           <input
@@ -199,7 +199,7 @@ const UploadPage = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             variant="secondary"
             className="flex-1"

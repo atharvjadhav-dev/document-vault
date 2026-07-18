@@ -12,7 +12,7 @@ import Button from '../components/ui/Button';
 const MAX_STORAGE_MB = 500; // Display cap for progress bar
 
 const StatCard = ({ icon, label, value, sub, color }) => (
-  <div className="card p-5">
+  <div className="rounded-2xl p-4 sm:p-5 border border-surface-100 dark:border-surface-dark-200 bg-white dark:bg-surface-dark-50 shadow-sm sm:shadow-card">
     <div className="flex items-start justify-between mb-3">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
         {icon}
@@ -138,7 +138,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Storage bar */}
-      <div className="card p-5">
+      <div className="rounded-2xl p-4 sm:p-5 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-white text-sm">Storage Usage</h3>
@@ -158,7 +158,7 @@ const DashboardPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Recent documents */}
-        <div className="lg:col-span-3 card p-5">
+        <div className="lg:col-span-3 rounded-2xl p-4 sm:p-5 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-slate-900 dark:text-white">Recent Documents</h2>
             <Link to="/documents" className="text-xs text-vault-600 dark:text-vault-400 hover:underline font-medium">
@@ -205,7 +205,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Category breakdown */}
-        <div className="lg:col-span-2 card p-5">
+        <div className="lg:col-span-2 rounded-2xl p-4 sm:p-5 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card">
           <h2 className="font-semibold text-slate-900 dark:text-white mb-4">By Category</h2>
           {!stats?.categories?.length ? (
             <p className="text-sm text-slate-400 text-center py-8">No categories yet</p>

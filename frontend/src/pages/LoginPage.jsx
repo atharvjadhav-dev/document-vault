@@ -111,9 +111,9 @@ const LoginPage = () => {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12 bg-slate-50 dark:bg-surface-dark transition-colors duration-200">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12 bg-white dark:bg-surface-dark sm:bg-slate-50/50 dark:sm:bg-surface-dark transition-colors duration-200">
         {/* Animated Wrapper Container */}
-        <div className="w-full max-w-md card p-8 sm:p-10 shadow-2xl border border-slate-200/60 dark:border-slate-800/80 bg-white/95 dark:bg-surface-dark-50/95 backdrop-blur-md border-t-4 border-t-vault-500 animate-slide-up">
+        <div className="w-full max-w-md rounded-2xl p-5 sm:p-10 shadow-none sm:shadow-2xl border-0 sm:border border-slate-200/60 dark:border-slate-800/80 bg-transparent sm:bg-white/95 dark:bg-transparent sm:dark:bg-surface-dark-50/95 backdrop-blur-none sm:backdrop-blur-md border-t-0 sm:border-t-4 border-t-vault-500 animate-slide-up">
           {/* Mobile logo */}
           <div className="flex items-center gap-2.5 mb-8 lg:hidden">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-vault-500 to-vault-700 flex items-center justify-center shadow-vault">

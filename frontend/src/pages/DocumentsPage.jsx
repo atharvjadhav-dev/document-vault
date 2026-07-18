@@ -107,7 +107,7 @@ const DocumentsPage = () => {
       </div>
 
       {/* Search & Filters */}
-      <div className="card p-4 flex flex-col sm:flex-row gap-3">
+      <div className="rounded-2xl p-0 sm:p-4 border-0 sm:border border-surface-100 dark:border-surface-dark-200 bg-transparent sm:bg-white dark:bg-transparent dark:sm:bg-surface-dark-50 shadow-none sm:shadow-card flex flex-col sm:flex-row gap-3">
         {/* Search */}
         <div className="relative flex-1">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
