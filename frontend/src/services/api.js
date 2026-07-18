@@ -59,6 +59,7 @@ export const documentsApi = {
   delete:   (id)       => api.delete(`/documents/${id}`),
 
   getDownloadUrl: (id) => `${API_URL}/documents/download/${id}`,
+  getSecureDownloadUrl: (id) => api.get(`/documents/${id}/download-url`),
 
   download: async (id) => {
     const response = await api.get(`/documents/${id}/download-url`);

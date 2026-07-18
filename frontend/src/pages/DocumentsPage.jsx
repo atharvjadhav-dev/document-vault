@@ -11,6 +11,7 @@ import DocumentDetailModal from '../components/documents/DocumentDetailModal';
 import EmptyState from '../components/ui/EmptyState';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
+import DocumentPreviewModal from '../components/documents/DocumentPreviewModal';
 
 const useDebounce = (value, delay) => {
   const [debounced, setDebounced] = useState(value);
@@ -33,6 +34,7 @@ const DocumentsPage = () => {
   const [editDoc,   setEditDoc]   = useState(null);
   const [deleteDoc, setDeleteDoc] = useState(null);
   const [viewDoc,   setViewDoc]   = useState(null);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   const search = useDebounce(searchRaw, 350);
 
@@ -203,6 +205,7 @@ const DocumentsPage = () => {
               onDelete={(d) => setDeleteDoc(d)}
               onEdit={(d) => setEditDoc(d)}
               onView={(d) => setViewDoc(d)}
+              onPreview={(d) => setPreviewDoc(d)}
             />
           ))}
         </div>
@@ -228,6 +231,7 @@ const DocumentsPage = () => {
                     onDelete={(d) => setDeleteDoc(d)}
                     onEdit={(d) => setEditDoc(d)}
                     onView={(d) => setViewDoc(d)}
+                    onPreview={(d) => setPreviewDoc(d)}
                   />
                 ))}
               </tbody>
@@ -252,6 +256,12 @@ const DocumentsPage = () => {
         onClose={() => setViewDoc(null)}
         onDownload={handleDownload}
         onEdit={(d) => { setViewDoc(null); setEditDoc(d); }}
+        onPreview={(d) => setPreviewDoc(d)}
+      />
+      <DocumentPreviewModal
+        document={previewDoc}
+        onClose={() => setPreviewDoc(null)}
+        onDownload={handleDownload}
       />
     </div>
   );
