@@ -1,4 +1,5 @@
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const DocumentModel = require('../models/documentModel');
 const storageService = require('../services/storageService');
 const { sendSuccess, sendError, sanitizeFilename } = require('../utils/helpers');
@@ -146,11 +147,32 @@ const deleteDocument = async (req, res, next) => {
 
 /**
  * GET /api/documents/download/:id
- * Stream a document file to the client.
+ * Stream a document file to the client using a short-lived download token.
  */
 const downloadDocument = async (req, res, next) => {
   try {
-    const document = await DocumentModel.findByIdAndUser(req.params.id, req.user.id);
+    const { token } = req.query;
+    if (!token) {
+      return sendError(res, 'Authentication required. Please provide a download token.', 401);
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET, {
+        issuer: 'document-vault',
+        audience: 'document-vault-client',
+      });
+    } catch (err) {
+      logger.warn('Download token verification failed', { error: err.message });
+      return sendError(res, 'Invalid or expired download token. Please try again.', 401);
+    }
+
+    // Verify token purpose and target document
+    if (decoded.purpose !== 'download' || decoded.docId !== req.params.id) {
+      return sendError(res, 'Unauthorized access to this document.', 403);
+    }
+
+    const document = await DocumentModel.findByIdAndUser(req.params.id, decoded.userId);
     if (!document) {
       return sendError(res, 'Document not found.', 404);
     }
@@ -167,7 +189,7 @@ const downloadDocument = async (req, res, next) => {
     );
     res.setHeader('Content-Type', document.mime_type || 'application/octet-stream');
 
-    logger.info('Document downloaded', { documentId: document.id, userId: req.user.id });
+    logger.info('Document downloaded via ephemeral token', { documentId: document.id, userId: decoded.userId });
 
     // For S3, downloadPath would be a signed URL — redirect
     if (downloadPath.startsWith('https://')) {
@@ -214,12 +236,24 @@ const getDownloadUrl = async (req, res, next) => {
 
     let downloadUrl = downloadPath;
     if (process.env.STORAGE_TYPE !== 's3') {
-      const authHeader = req.headers.authorization;
-      const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : '';
+      // Generate a short-lived (60 seconds) single-purpose token for downloading this specific file
+      const downloadToken = jwt.sign(
+        {
+          docId: document.id,
+          userId: req.user.id,
+          purpose: 'download',
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: '60s',
+          issuer: 'document-vault',
+          audience: 'document-vault-client',
+        }
+      );
 
       const host = req.get('host');
       const protocol = req.protocol;
-      downloadUrl = `${protocol}://${host}/api/documents/download/${document.id}?token=${encodeURIComponent(token)}`;
+      downloadUrl = `${protocol}://${host}/api/documents/download/${document.id}?token=${encodeURIComponent(downloadToken)}`;
     }
 
     return res.json({

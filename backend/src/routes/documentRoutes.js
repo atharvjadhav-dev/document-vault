@@ -20,15 +20,17 @@ const {
 
 const router = express.Router();
 
+// Expose download route before global authenticate middleware to use custom token authentication.
+router.get('/download/:id',   validateDocumentId, downloadDocument);
+
 // All document routes require authentication
 router.use(authenticate);
 
-// IMPORTANT: /stats and /download/:id must come BEFORE /:id
-// to avoid Express treating "stats" and "download" as UUID params
+// IMPORTANT: /stats must come BEFORE /:id
+// to avoid Express treating "stats" as UUID params
 
 router.get('/stats',          getStats);
 router.get('/:id/download-url', authenticate, getDownloadUrl);
-router.get('/download/:id',   validateDocumentId, downloadDocument);
 
 router.get('/',               validateSearch,      getDocuments);
 router.post('/',              uploadSingle('file'), validateDocumentUpload, uploadDocument);
