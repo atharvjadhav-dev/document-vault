@@ -251,9 +251,7 @@ const getDownloadUrl = async (req, res, next) => {
         }
       );
 
-      const host = req.get('host');
-      const protocol = req.protocol;
-      downloadUrl = `${protocol}://${host}/api/documents/download/${document.id}?token=${encodeURIComponent(downloadToken)}`;
+      downloadUrl = `/api/documents/download/${document.id}?token=${encodeURIComponent(downloadToken)}`;
     }
 
     return res.json({
