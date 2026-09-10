@@ -70,7 +70,13 @@ class StorageService {
     if (STORAGE_TYPE === 's3') {
       return this._getS3SignedUrl(filePath, originalFilename);
     }
-    return path.resolve(filePath);
+    const resolvedPath = path.resolve(filePath);
+    const absUploadPath = path.resolve(UPLOAD_PATH);
+    if (!resolvedPath.startsWith(absUploadPath + path.sep) && resolvedPath !== absUploadPath) {
+      logger.error('Security alert: Attempted path traversal attack', { filePath, resolvedPath });
+      throw new Error('Access denied: Invalid file path');
+    }
+    return resolvedPath;
   }
 
   // ── Local Storage ──────────────────────────────────────────────────────────
@@ -95,9 +101,15 @@ class StorageService {
 
   async _deleteFromLocal(filePath) {
     try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        logger.info('File deleted from local storage', { filePath });
+      const resolvedPath = path.resolve(filePath);
+      const absUploadPath = path.resolve(UPLOAD_PATH);
+      if (!resolvedPath.startsWith(absUploadPath + path.sep) && resolvedPath !== absUploadPath) {
+        logger.error('Security alert: Attempted path traversal attack during delete', { filePath, resolvedPath });
+        throw new Error('Access denied: Invalid file path');
+      }
+      if (fs.existsSync(resolvedPath)) {
+        fs.unlinkSync(resolvedPath);
+        logger.info('File deleted from local storage', { filePath: resolvedPath });
       }
     } catch (error) {
       logger.error('Failed to delete file from local storage', {
