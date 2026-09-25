@@ -2,7 +2,7 @@
 
 A production-grade, secure document storage platform built with React, Node.js, PostgreSQL, and Docker — deployed live on AWS.
 
-🌐 **Live Website**: [http://atharv-vault.duckdns.com](http://atharv-vault.duckdns.com)
+🌐 **Live Website**: [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)
 
 ---
 
@@ -27,7 +27,7 @@ A production-grade, secure document storage platform built with React, Node.js, 
 ## 🌐 Live Website
 
 The application is deployed and accessible live at:
-👉 **[atharv-vault.duckdns.com](http://atharv-vault.duckdns.com)**
+👉 **[document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)**
 
 ---
 
@@ -43,8 +43,8 @@ It features automated deployment via GitHub Actions to an AWS EC2 instance, dyna
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                 LIVE DEPLOYMENT (DuckDNS)                   │
-│                atharv-vault.duckdns.com                     │
+│                 LIVE DEPLOYMENT (Hostinger DNS)             │
+│                document-vault.atharvjadhav.xyz              │
 └──────────────────────────────┬──────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────┐
@@ -83,7 +83,7 @@ It features automated deployment via GitHub Actions to an AWS EC2 instance, dyna
 
 ## Features
 
-- 🌐 **Live Online Deployment** — Accessible worldwide via `atharv-vault.duckdns.com`
+- 🌐 **Live Online Deployment** — Accessible worldwide via `document-vault.atharvjadhav.xyz`
 - 🔐 **JWT Authentication** — Register, Login, User Profile (`/auth/me`), and secure token authorization
 - 📁 **Document Management** — Upload, Download, Delete, Rename, and recategorize documents
 - 🏷️ **Categorization** — Aadhaar, PAN, Passport, Education, Resume, Certificates, Personal, Other
@@ -134,7 +134,7 @@ docker compose up --build
 | Frontend | http://localhost:5173 |
 | Backend API | http://localhost:5000 |
 | API Health Check | http://localhost:5000/api/health |
-| **Live Production** | **[http://atharv-vault.duckdns.com](http://atharv-vault.duckdns.com)** |
+| **Live Production** | **[https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)** |
 
 ---
 
@@ -275,7 +275,7 @@ This project uses **GitHub Actions** for continuous integration and delivery.
   1. Connects securely to the AWS EC2 instance via SSH.
   2. Pulls latest changes from GitHub repository.
   3. Rebuilds and restarts Docker containers (`docker compose up -d --build`).
-- **Domain & Routing**: DuckDNS (`atharv-vault.duckdns.com`) maps dynamic DNS updates to the EC2 server IP.
+- **Domain & Routing**: Hostinger DNS (`document-vault.atharvjadhav.xyz`) maps to the EC2 server IP.
 
 ---
 
