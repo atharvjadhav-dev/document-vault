@@ -35,7 +35,7 @@ The application is deployed and accessible live at:
 
 **Document Vault** is a secure, cloud-ready document storage platform where users can upload, manage, search, download, and organize personal documents such as Aadhaar, PAN, Passport, Education certificates, Resumes, and more. 
 
-It features automated deployment via GitHub Actions to an AWS EC2 instance, dynamic DNS routing with DuckDNS, isolated containerized architecture using Docker Compose, and robust security measures including JWT authentication, rate limiting, and parameterization.
+It features automated deployment via GitHub Actions to an AWS EC2 instance, custom domain routing via Hostinger DNS (`document-vault.atharvjadhav.xyz`) with automated Let's Encrypt SSL/TLS, isolated containerized architecture using Docker Compose, deep magic-byte file signature validation, automated daily S3 database disaster recovery backups, and robust security measures including JWT authentication, rate limiting, and SQL parameterization.
 
 ---
 
@@ -75,9 +75,9 @@ It features automated deployment via GitHub Actions to an AWS EC2 instance, dyna
 | **Backend** | Node.js, Express.js |
 | **Database** | PostgreSQL 15 (Alpine) |
 | **Auth** | JWT (JSON Web Tokens), bcryptjs |
-| **DevOps & Hosting** | Docker, Docker Compose, AWS EC2, DuckDNS |
+| **DevOps & Hosting** | Docker, Docker Compose, AWS EC2, Hostinger DNS, Let's Encrypt SSL |
 | **CI/CD** | GitHub Actions (Auto SSH deployment on push to `main`) |
-| **Security** | Helmet, rate-limiting, multer, express-validator |
+| **Security** | Helmet, rate-limiting, multer, magic-byte inspection, express-validator |
 
 ---
 
@@ -90,7 +90,8 @@ It features automated deployment via GitHub Actions to an AWS EC2 instance, dyna
 - 🔍 **Search & Filter** — Instant search by file name or filtering by document category
 - 📊 **Dashboard Analytics** — Total documents count, category breakdowns, and storage usage stats (`/documents/stats`)
 - 🤖 **Automated CI/CD** — GitHub Actions automatically builds and deploys code updates to AWS EC2
-- 🛡️ **Enterprise Security** — Rate limiting on authentication routes, helmet HTTP headers, input sanitization, double MIME-type checks
+- 🛡️ **Enterprise Security & Malware Blocker** — Deep magic-byte binary inspection preventing disguised executables (PE/ELF/scripts), rate limiting, helmet HTTP headers, and double MIME validation
+- 🗄️ **Automated S3 Disaster Recovery** — Automated daily PostgreSQL backups compressed with gzip and streamed to AWS S3
 - 🌗 **Dark Mode & Responsive UI** — Styled with Tailwind CSS for mobile and desktop screens
 - ☁️ **AWS-Ready Storage** — Storage service abstraction supporting local volume storage or AWS S3
 
@@ -171,7 +172,7 @@ docker compose up --build
 
 ## API Documentation
 
-### Base URL: `http://localhost:5000/api` (or `http://atharv-vault.duckdns.com/api`)
+### Base URL: `http://localhost:5000/api` (Production: `https://document-vault.atharvjadhav.xyz/api`)
 
 ### Authentication Endpoints
 
@@ -260,7 +261,8 @@ document-vault/
 - 🔑 **Token Authentication**: Stateless JWT authorization headers with configurable expiration
 - 🛡️ **HTTP Hardening**: Security headers injected via `helmet`
 - ⛔ **Rate Limiting**: IP-based rate limiting on global API and strict thresholds on login/register routes
-- 📁 **File Upload Security**: Allowed file types and maximum payload sizes enforced via `multer` and MIME verification
+- 📁 **File Upload Security & Magic-Byte Validation**: Deep binary signature inspection (magic bytes) prevents MIME spoofing, instantly rejecting executable payloads (PE, ELF, shell scripts, Java bytecode, PHP tags) and scrubbing them from disk
+- 🗄️ **Automated Disaster Recovery**: Scheduled daily database dumps to Amazon S3 with gzip compression and retention pruning
 - 💉 **SQL Injection Prevention**: Parameterized queries using PostgreSQL `pg` client
 - 🌐 **CORS Configuration**: Restrictive cross-origin resource sharing policy
 
