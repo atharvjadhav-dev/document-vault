@@ -1,7 +1,9 @@
+const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { sendError } = require('../utils/helpers');
+const { validateFileSignature } = require('../utils/fileValidator');
 const logger = require('../utils/logger');
 
 const UPLOAD_PATH = path.resolve(process.env.UPLOAD_PATH || './uploads');
@@ -59,25 +61,45 @@ const upload = multer({
 });
 
 /**
- * Middleware wrapper that handles multer errors gracefully.
+ * Middleware wrapper that handles multer errors gracefully and performs
+ * deep magic byte / file signature inspection to prevent MIME spoofing.
  */
 const uploadSingle = (fieldName) => (req, res, next) => {
   upload.single(fieldName)(req, res, (err) => {
-    if (!err) return next();
-
-    if (err instanceof multer.MulterError) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return sendError(
-          res,
-          `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)} MB.`,
-          400
-        );
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return sendError(
+            res,
+            `File too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)} MB.`,
+            400
+          );
+        }
+        return sendError(res, `Upload error: ${err.message}`, 400);
       }
-      return sendError(res, `Upload error: ${err.message}`, 400);
+      return sendError(res, err.message || 'File upload failed.', 400);
     }
 
-    // File type rejection
-    return sendError(res, err.message || 'File upload failed.', 400);
+    if (!req.file) {
+      return next();
+    }
+
+    // ── Deep Magic Byte / File Signature Validation ──────────────────────────
+    const validation = validateFileSignature(req.file.path, req.file.originalname);
+    if (!validation.valid) {
+      // Clean up the rejected file from disk immediately
+      try {
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+      } catch (cleanupErr) {
+        logger.error('Failed to cleanup rejected file', { error: cleanupErr.message });
+      }
+
+      return sendError(res, validation.error, 400);
+    }
+
+    return next();
   });
 };
 
