@@ -1,297 +1,322 @@
 # 🔐 Document Vault
 
-A production-grade, secure document storage platform built with React, Node.js, PostgreSQL, and Docker — deployed live on AWS.
+[![Deploy Document Vault](https://github.com/atharvjadhav-dev/document-vault/actions/workflows/deploy.yml/badge.svg)](https://github.com/atharvjadhav-dev/document-vault/actions/workflows/deploy.yml)
+[![Docker](https://img.shields.io/badge/Docker-Docker%20Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20S3-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![SSL](https://img.shields.io/badge/SSL-Let's%20Encrypt-003A70?logo=letsencrypt&logoColor=white)](https://letsencrypt.org/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-🌐 **Live Website**: [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)
+A production-grade, secure cloud document vault built with **React 18**, **Node.js Express**, **PostgreSQL 15**, and **AWS S3** — fully containerized with **Docker Compose**, protected by **deep magic-byte malware detection**, and deployed live on **AWS EC2** with automated **GitHub Actions CI/CD**.
+
+🌐 **Live Website**: [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)  
+🩺 **API Healthcheck**: [https://document-vault.atharvjadhav.xyz/api/health](https://document-vault.atharvjadhav.xyz/api/health)  
+📖 **DevOps Runbook & Handover**: [HANDOVER.md](HANDOVER.md)
 
 ---
 
 ## 📋 Table of Contents
 
-- [Live Website](#-live-website)
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Environment Variables](#environment-variables)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Security](#security)
-- [CI/CD & Deployment](#cicd--deployment)
-- [AWS Migration Guide](#aws-migration-guide)
-- [License](#license)
+- [Architecture](#-architecture)
+- [Key Features](#-key-features)
+- [Tech Stack](#-tech-stack)
+- [Security Hardening](#-security-hardening)
+- [Disaster Recovery & Backups](#-disaster-recovery--backups)
+- [Quick Start (Local)](#-quick-start-local)
+- [Environment Variables](#-environment-variables)
+- [API Documentation](#-api-documentation)
+- [Project Structure](#-project-structure)
+- [CI/CD & Deployment](#-cicd--deployment)
+- [DevOps Runbook](#-devops-runbook)
+- [License](#-license)
 
 ---
 
-## 🌐 Live Website
-
-The application is deployed and accessible live at:
-👉 **[document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)**
-
----
-
-## Overview
-
-**Document Vault** is a secure, cloud-ready document storage platform where users can upload, manage, search, download, and organize personal documents such as Aadhaar, PAN, Passport, Education certificates, Resumes, and more. 
-
-It features automated deployment via GitHub Actions to an AWS EC2 instance, custom domain routing via Hostinger DNS (`document-vault.atharvjadhav.xyz`) with automated Let's Encrypt SSL/TLS, isolated containerized architecture using Docker Compose, deep magic-byte file signature validation, automated daily S3 database disaster recovery backups, and robust security measures including JWT authentication, rate limiting, and SQL parameterization.
-
----
-
-## Architecture
+## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                 LIVE DEPLOYMENT (Hostinger DNS)             │
-│                document-vault.atharvjadhav.xyz              │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-┌──────────────────────────────▼──────────────────────────────┐
-│                     AWS EC2 INSTANCE                        │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │                   DOCKER COMPOSE                      │  │
-│  │  ┌──────────────┐   ┌──────────────┐   ┌───────────┐  │  │
-│  │  │   Frontend   │   │   Backend    │   │ Postgres  │  │  │
-│  │  │ React + Vite │──▶│  Express.js  │──▶│    DB     │  │  │
-│  │  │  (Port 5173) │   │  (Port 5000) │   │(Port 5432)│  │  │
-│  │  └──────────────┘   ───────┬───────┘   └───────────┘  │  │
-│  │                            │                          │  │
-│  │                   ┌────────▼────────┐                 │  │
-│  │                   │  Storage Layer  │                 │  │
-│  │                   │  (Local / S3)   │                 │  │
-│  │                   └─────────────────┘                 │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+                                  [ Users & Clients ]
+                                           │
+                                           │ HTTPS (Port 443) / HTTP (Port 80)
+                                           ▼
+                       ┌───────────────────────────────────────┐
+                       │            Hostinger DNS              │
+                       │   document-vault.atharvjadhav.xyz     │
+                       └───────────────────┬───────────────────┘
+                                           │ (Resolves to 65.1.139.188)
+                                           ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 AWS EC2 INSTANCE (Ubuntu)                              │
+│                                                                                        │
+│   ┌────────────────────────────────────────────────────────────────────────────────┐   │
+│   │                        Host NGINX Reverse Proxy                                │   │
+│   │   • Let's Encrypt SSL/TLS Certificate (Auto-renewed via Certbot timer)         │   │
+│   │   • Port 80 ──[ 301 Permanent Redirect ]──▶ Port 443 (HTTPS)                   │   │
+│   │   • Route "/"      ──▶ http://localhost:5173  (Frontend Container)            │   │
+│   │   • Route "/api/"  ──▶ http://localhost:5000  (Backend API Container)          │   │
+│   └───────────────────────┬───────────────────────────────┬────────────────────────┘   │
+│                           │                               │                            │
+│ ┌─────────────────────────┼───────────────────────────────┼──────────────────────────┐ │
+│ │                         ▼                               ▼         vault_network    │ │
+│ │              ┌──────────────────────┐        ┌──────────────────────┐              │ │
+│ │              │    vault_frontend    │        │    vault_backend     │              │ │
+│ │              │  React 18 + Vite SPA │        │   Express.js REST    │              │ │
+│ │              │    (Nginx Alpine)    │        │  (Node 18 + Multer)  │              │ │
+│ │              │    Port 5173:80      │        │    Port 5000:5000    │              │ │
+│ │              └──────────────────────┘        └──────────┬───────────┘              │ │
+│ │                                                         │                          │ │
+│ │                                                         ▼                          │ │
+│ │                                              ┌──────────────────────┐              │ │
+│ │                                              │    vault_postgres    │              │ │
+│ │                                              │    PostgreSQL 15     │              │ │
+│ │                                              │    Port 5432:5432    │              │ │
+│ │                                              │ (Vol: postgres_data) │              │ │
+│ │                                              └──────────────────────┘              │ │
+│ └─────────────────────────────────────────────────────────┼──────────────────────────┘ │
+│                                                           │                            │
+│   ┌───────────────────────────────────────────────────────┴────────────────────────┐   │
+│   │                 Automated Daily DB Backup Script (scripts/backup-db.sh)        │   │
+│   │                 • Triggered by host cron at 2:00 AM UTC (0 2 * * *)            │   │
+│   │                 • Dumps PostgreSQL, compresses with gzip                       │   │
+│   └───────────────────────────────────────┬────────────────────────────────────────┘   │
+└───────────────────────────────────────────┼────────────────────────────────────────────┘
+                                            │
+                                            ▼ (Direct AWS SDK S3 Stream)
+                       ┌────────────────────────────────────────┐
+                       │          Amazon S3 Storage             │
+                       │      Bucket: document-vault-files      │
+                       │                                        │
+                       │  📁 /vault-documents/ (User uploads)   │
+                       │  📁 /database-backups/ (SQL dumps)     │
+                       └────────────────────────────────────────┘
 ```
 
 ---
 
-## Tech Stack
+## ✨ Key Features
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React 18, Vite, Tailwind CSS, React Router v6, Axios |
-| **Backend** | Node.js, Express.js |
-| **Database** | PostgreSQL 15 (Alpine) |
-| **Auth** | JWT (JSON Web Tokens), bcryptjs |
-| **DevOps & Hosting** | Docker, Docker Compose, AWS EC2, Hostinger DNS, Let's Encrypt SSL |
-| **CI/CD** | GitHub Actions (Auto SSH deployment on push to `main`) |
-| **Security** | Helmet, rate-limiting, multer, magic-byte inspection, express-validator |
-
----
-
-## Features
-
-- 🌐 **Live Online Deployment** — Accessible worldwide via `document-vault.atharvjadhav.xyz`
-- 🔐 **JWT Authentication** — Register, Login, User Profile (`/auth/me`), and secure token authorization
-- 📁 **Document Management** — Upload, Download, Delete, Rename, and recategorize documents
-- 🏷️ **Categorization** — Aadhaar, PAN, Passport, Education, Resume, Certificates, Personal, Other
-- 🔍 **Search & Filter** — Instant search by file name or filtering by document category
-- 📊 **Dashboard Analytics** — Total documents count, category breakdowns, and storage usage stats (`/documents/stats`)
-- 🤖 **Automated CI/CD** — GitHub Actions automatically builds and deploys code updates to AWS EC2
-- 🛡️ **Enterprise Security & Malware Blocker** — Deep magic-byte binary inspection preventing disguised executables (PE/ELF/scripts), rate limiting, helmet HTTP headers, and double MIME validation
-- 🗄️ **Automated S3 Disaster Recovery** — Automated daily PostgreSQL backups compressed with gzip and streamed to AWS S3
-- 🌗 **Dark Mode & Responsive UI** — Styled with Tailwind CSS for mobile and desktop screens
-- ☁️ **AWS-Ready Storage** — Storage service abstraction supporting local volume storage or AWS S3
+- 🌐 **Custom Domain & HTTPS Ingress** — Live at `document-vault.atharvjadhav.xyz` with automated Let's Encrypt SSL certificates.
+- 🛡️ **Zero-Trust Magic-Byte Inspection** — Validates true binary signatures (initial 512 bytes on disk). Rejects and immediately deletes disguised Windows executables (`MZ`), Linux ELF binaries, shell scripts, and Java bytecode.
+- 🗄️ **Automated S3 Disaster Recovery** — Nightly cron job dumps PostgreSQL, compresses with gzip, and streams snapshots to AWS S3 with automated 30-day retention pruning.
+- 📁 **Complete Document Lifecycle** — Upload, view, download, rename, recategorize, and delete documents with instant search and category filtering.
+- 🏷️ **Intelligent Categorization** — Aadhaar, PAN, Passport, Education, Resume, Certificates, Personal, and Other.
+- 📊 **Dashboard & Storage Analytics** — Live document counts, category distribution breakdowns, and disk/S3 storage usage summaries (`/api/documents/stats`).
+- 🤖 **Automated CI/CD Pipeline** — GitHub Actions automatically deploys commits on `main` to EC2 via SSH with zero manual server intervention.
+- 🔐 **Hardened Authentication** — Stateless JWT authentication, 12-round bcrypt password hashing, and role-based user profiles (`/api/auth/me`).
+- 🌗 **Responsive Modern Interface** — Clean responsive layout with Tailwind CSS optimized for mobile and desktop screens.
 
 ---
 
-## Quick Start
+## 🛠️ Tech Stack
+
+| Domain | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, Vite, Tailwind CSS, Lucide Icons, Axios | Single-page application UI |
+| **Backend** | Node.js, Express.js, Multer | REST API, validation, upload pipeline |
+| **Database** | PostgreSQL 15 (Alpine) | Relational document metadata & user accounts |
+| **Cloud Storage** | AWS S3 (`ap-south-1`) | Persistent object storage for documents & backups |
+| **Compute & Host** | AWS EC2 (Ubuntu 22.04) | Microservice container host |
+| **Domain & DNS** | Hostinger DNS | Managed DNS A-record routing |
+| **Reverse Proxy** | NGINX (Host & Container) | SSL termination, HTTP-to-HTTPS redirect, proxy routing |
+| **SSL / TLS** | Let's Encrypt / Certbot | Automatic SSL certificates with systemd timer renewal |
+| **Containers** | Docker & Docker Compose | Multi-container isolation, healthchecks & bridge networking |
+| **CI/CD** | GitHub Actions | Automated build, test, and remote SSH deployment |
+| **Security** | Magic-byte inspector, Helmet, Rate Limiter | Anti-malware, header hardening, brute-force mitigation |
+
+---
+
+## 🛡️ Security Hardening
+
+### 1. Magic-Byte File Signature Validator
+Multer alone only verifies client-supplied MIME types and file extensions, which are easily spoofed by renaming `malware.exe` to `invoice.pdf`. Our [`fileValidator.js`](backend/src/utils/fileValidator.js) middleware inspects the raw binary bytes on disk:
+* **Blocked Signatures**:
+  * Windows Executable / PE (`4D 5A` / `MZ`)
+  * Linux Executable / ELF (`7F 45 4C 46`)
+  * Shell Scripts (`23 21` / `#!`)
+  * Java Bytecode (`CA FE BA BE`)
+  * Embedded PHP / Script tags (`<?php`, `<script`)
+* **Verified Formats**: PDF (`%PDF-`), PNG, JPEG, MS Office OpenXML (`.docx`), Legacy Word (`.doc`).
+* **Instant Disk Scrub**: Any prohibited or mismatched payload is immediately deleted via `fs.unlinkSync` before it can touch storage.
+
+### 2. Path Traversal & Host Header Protection
+* Merged security fixes (PR #1) ensuring filenames are sanitized against path traversal (`../`) and download URLs remain strictly relative to prevent host-header poisoning.
+
+### 3. API Defense-in-Depth
+* **Helmet**: Injects HTTP security headers (`Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `HSTS`).
+* **Rate Limiting**: 100 requests per 15 minutes globally; strict 10 attempts per 15 minutes on login/register routes.
+* **SQL Injection Prevention**: 100% parameterized queries via PostgreSQL `pg` pool.
+
+---
+
+## 🗄️ Disaster Recovery & Backups
+
+Automated database disaster recovery runs completely in the cloud:
+* **Script**: [`scripts/backup-db.sh`](scripts/backup-db.sh)
+* **Schedule**: Daily at `2:00 AM UTC` (`0 2 * * *`) via system cron on EC2.
+* **Process**:
+  1. Dumps the active database from the `vault_postgres` container using `pg_dump`.
+  2. Compresses the SQL snapshot using `gzip`.
+  3. Uses the AWS SDK inside `vault_backend` to stream the dump directly to `s3://document-vault-files/database-backups/`.
+  4. Automatically removes snapshots older than 30 days.
+
+---
+
+## 🚀 Quick Start (Local)
 
 ### Prerequisites
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (v24+)
+* [Docker Compose](https://docs.docker.com/compose/) (v2+)
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (v24+)
-- [Docker Compose](https://docs.docker.com/compose/) (v2+)
-- Node.js (v18+) *(Optional, for local development without Docker)*
-
-### 1. Clone the Repository
-
+### 1. Clone Repository
 ```bash
 git clone https://github.com/atharvjadhav-dev/document-vault.git
 cd document-vault
 ```
 
-### 2. Set Up Environment Files
-
+### 2. Configure Environment Files
 ```bash
-# Copy example env files
+# Backend configuration
 cp backend/.env.example backend/.env
+
+# Frontend configuration
 cp frontend/.env.example frontend/.env
 ```
 
-Edit `backend/.env` with your desired secrets (see [Environment Variables](#environment-variables)).
-
-### 3. Run with Docker Compose
-
+### 3. Start Multi-Container Stack
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
-### 4. Access the Local Application
-
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:5000 |
-| API Health Check | http://localhost:5000/api/health |
-| **Live Production** | **[https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)** |
+### 4. Verify Services
+| Service | Local Endpoint |
+| :--- | :--- |
+| **Frontend** | [http://localhost:5173](http://localhost:5173) |
+| **Backend API** | [http://localhost:5000](http://localhost:5000) |
+| **Health Check** | [http://localhost:5000/api/health](http://localhost:5000/api/health) |
 
 ---
 
-## Environment Variables
+## ⚙️ Environment Variables
 
-### Backend (`backend/.env`)
+### Backend Configuration (`backend/.env`)
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `NODE_ENV` | Application environment | `development` / `production` |
-| `PORT` | Express server port | `5000` |
-| `DB_HOST` | PostgreSQL host | `postgres` (or `localhost`) |
-| `DB_PORT` | PostgreSQL port | `5432` |
-| `DB_NAME` | Database name | `document_vault` |
-| `DB_USER` | Database user | `vault_user` |
-| `DB_PASSWORD` | Database password | `strongpassword` |
-| `JWT_SECRET` | Secret key for JWT signing | `your-256-bit-secret` |
-| `JWT_EXPIRES_IN` | Token duration | `7d` |
-| `MAX_FILE_SIZE` | Max file upload limit in bytes | `10485760` (10MB) |
-| `STORAGE_TYPE` | Storage engine (`local` or `s3`) | `local` |
-| `UPLOAD_PATH` | Directory for local upload storage | `./uploads` |
-| `CORS_ORIGIN` | Allowed origin for API requests | `http://localhost:5173` |
-| `RATE_LIMIT_WINDOW_MS` | Window timeframe for rate limiting | `900000` (15 mins) |
-| `RATE_LIMIT_MAX` | Max requests per IP window | `100` |
-| `AUTH_RATE_LIMIT_MAX` | Max login/register attempts per window | `10` |
+| Variable | Description | Production Value / Example |
+| :--- | :--- | :--- |
+| `NODE_ENV` | Environment mode | `production` |
+| `PORT` | Node server listen port | `5000` |
+| `DB_HOST` | Database host | `postgres` |
+| `DB_PORT` | Database port | `5432` |
+| `DB_NAME` | PostgreSQL database name | `document_vault` |
+| `DB_USER` | PostgreSQL username | `vault_user` |
+| `DB_PASSWORD` | PostgreSQL password | `[REDACTED_STRONG_PASSWORD]` |
+| `JWT_SECRET` | 256-bit secret key for token signing | `[REDACTED_RANDOM_SECRET]` |
+| `JWT_EXPIRES_IN` | Token validity duration | `7d` |
+| `MAX_FILE_SIZE` | Maximum upload limit in bytes | `10485760` (10 MB) |
+| `STORAGE_TYPE` | Storage engine (`local` or `s3`) | `s3` |
+| `AWS_REGION` | AWS S3 region | `ap-south-1` |
+| `AWS_BUCKET_NAME` | AWS S3 bucket name | `document-vault-files` |
+| `AWS_ACCESS_KEY_ID` | AWS IAM Access Key | `[REDACTED_IAM_KEY]` |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM Secret Key | `[REDACTED_IAM_SECRET]` |
+| `CORS_ORIGIN` | Allowed client origin | `https://document-vault.atharvjadhav.xyz` |
+| `RATE_LIMIT_WINDOW_MS` | Rate limit timeframe in ms | `900000` (15 mins) |
+| `RATE_LIMIT_MAX` | Global max requests per IP | `100` |
+| `AUTH_RATE_LIMIT_MAX` | Max auth attempts per IP | `10` |
 
-### Frontend (`frontend/.env`)
+### Frontend Configuration (`frontend/.env`)
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_API_URL` | Backend API base endpoint | `http://localhost:5000/api` |
+| Variable | Description | Value |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | Base API URL | `/api` (or `http://localhost:5000/api`) |
 
 ---
 
-## API Documentation
+## 📡 API Documentation
 
-### Base URL: `http://localhost:5000/api` (Production: `https://document-vault.atharvjadhav.xyz/api`)
+**Base Production URL**: `https://document-vault.atharvjadhav.xyz/api`
 
-### Authentication Endpoints
+### 1. System & Authentication
 
 | Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `POST` | `/auth/register` | Register a new user | No |
-| `POST` | `/auth/login` | Login user & return JWT token | No |
-| `GET` | `/auth/me` | Fetch active user profile details | Yes |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/health` | Server health, database status, and uptime | No |
+| `POST` | `/auth/register` | Register new account (`fullName`, `email`, `password`) | No |
+| `POST` | `/auth/login` | Authenticate user & issue JWT token | No |
+| `GET` | `/auth/me` | Retrieve authenticated user profile | **Yes** |
 
-#### Register (`POST /auth/register`)
-**Body:**
-```json
-{
-  "fullName": "John Doe",
-  "email": "john@example.com",
-  "password": "SecurePass123!"
-}
-```
+### 2. Document Management
 
-#### Login (`POST /auth/login`)
-**Body:**
-```json
-{
-  "email": "john@example.com",
-  "password": "SecurePass123!"
-}
-```
-
----
-
-### Document Endpoints
-
-*All document endpoints require header: `Authorization: Bearer <token>` (except direct download token links).*
+*All document endpoints require `Authorization: Bearer <token>`.*
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/documents` | List documents (Supports `?search=` and `?category=`) |
+| :--- | :--- | :--- |
+| `GET` | `/documents` | List documents (supports `?search=` and `?category=`) |
 | `POST` | `/documents` | Upload document (`multipart/form-data`) |
-| `GET` | `/documents/stats` | Fetch usage statistics & storage summaries |
+| `GET` | `/documents/stats` | Retrieve total documents, category counts & storage totals |
 | `GET` | `/documents/:id` | Get metadata for a specific document |
-| `PUT` | `/documents/:id` | Rename document filename or update category |
-| `DELETE` | `/documents/:id` | Permanently delete document file and DB record |
-| `GET` | `/documents/:id/download-url` | Generate timed secure download link |
-| `GET` | `/documents/download/:id` | Download actual document binary file |
+| `PUT` | `/documents/:id` | Rename document or update its category |
+| `DELETE` | `/documents/:id` | Delete document from database and S3 storage |
+| `GET` | `/documents/:id/download-url` | Generate secure download URL |
+| `GET` | `/documents/download/:id` | Stream document binary file |
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 document-vault/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml        # Continuous deployment pipeline to EC2
+│       └── deploy.yml          # GitHub Actions CI/CD pipeline (SSH to EC2)
 ├── backend/
 │   ├── src/
-│   │   ├── config/           # Database setup & initialization scripts
-│   │   ├── controllers/      # Handlers for auth and document operations
-│   │   ├── middleware/       # Auth, validation, upload & error handling
-│   │   ├── models/           # Data access objects & SQL queries
-│   │   ├── routes/           # Express router endpoints
-│   │   ├── services/         # Storage abstraction (Local/S3) & auth logic
-│   │   └── utils/            # Winston logger & helper utilities
-│   ├── uploads/              # Local uploaded files directory (gitignored)
+│   │   ├── config/             # PostgreSQL database pool & table migrations
+│   │   ├── controllers/        # Auth & Document request handlers
+│   │   ├── middleware/         # JWT auth, rate limits, upload & magic-byte validator
+│   │   ├── models/             # Data access objects & SQL queries
+│   │   ├── routes/             # Express API endpoints
+│   │   ├── services/           # S3 & Local storage provider abstraction
+│   │   └── utils/              # Magic-byte file validator, Winston logger & helpers
+│   ├── .env.example
 │   ├── Dockerfile
 │   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── components/       # UI components (Navbar, Modal, DocumentCard, etc.)
-│   │   ├── contexts/         # AuthContext & global state
-│   │   ├── hooks/            # Custom React hooks
-│   │   ├── pages/            # View pages (Login, Dashboard, Documents, Profile)
-│   │   ├── services/         # Axios API clients
-│   │   └── utils/            # Formatting & UI helpers
+│   │   ├── components/         # Navbar, Modals, DocumentCards, Analytics widgets
+│   │   ├── contexts/           # AuthContext & global state
+│   │   ├── pages/              # Login, Register, Dashboard, Documents, Profile
+│   │   └── services/           # Axios API HTTP client
+│   ├── nginx.conf              # Container NGINX config with /api/ proxy
+│   ├── .env.example
 │   ├── Dockerfile
 │   └── package.json
-├── docker-compose.yml        # Multi-container orchestration
-└── README.md                 # Project documentation
+├── scripts/
+│   └── backup-db.sh            # Automated PostgreSQL-to-S3 backup & retention script
+├── docker-compose.yml          # Multi-container orchestration (Backend, Frontend, DB)
+├── HANDOVER.md                 # Complete DevOps Handover & Production Runbook
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## Security
+## 🔄 CI/CD & Deployment
 
-- 🔒 **Password Protection**: Salting and hashing with `bcryptjs` (12 rounds)
-- 🔑 **Token Authentication**: Stateless JWT authorization headers with configurable expiration
-- 🛡️ **HTTP Hardening**: Security headers injected via `helmet`
-- ⛔ **Rate Limiting**: IP-based rate limiting on global API and strict thresholds on login/register routes
-- 📁 **File Upload Security & Magic-Byte Validation**: Deep binary signature inspection (magic bytes) prevents MIME spoofing, instantly rejecting executable payloads (PE, ELF, shell scripts, Java bytecode, PHP tags) and scrubbing them from disk
-- 🗄️ **Automated Disaster Recovery**: Scheduled daily database dumps to Amazon S3 with gzip compression and retention pruning
-- 💉 **SQL Injection Prevention**: Parameterized queries using PostgreSQL `pg` client
-- 🌐 **CORS Configuration**: Restrictive cross-origin resource sharing policy
+Every push to the `main` branch triggers `.github/workflows/deploy.yml`:
+1. Connects securely to the AWS EC2 instance via SSH.
+2. Synchronizes repository state: `git fetch origin && git reset --hard origin/main`.
+3. Rebuilds and relaunches updated Docker containers: `docker compose up -d --build`.
+4. Prunes stale dangling Docker images automatically: `docker image prune -af`.
 
 ---
 
-## CI/CD & Deployment
+## 📖 DevOps Runbook
 
-This project uses **GitHub Actions** for continuous integration and delivery.
-
-- **Trigger**: Every push to the `main` branch.
-- **Workflow** (`.github/workflows/deploy.yml`):
-  1. Connects securely to the AWS EC2 instance via SSH.
-  2. Pulls latest changes from GitHub repository.
-  3. Rebuilds and restarts Docker containers (`docker compose up -d --build`).
-- **Domain & Routing**: Hostinger DNS (`document-vault.atharvjadhav.xyz`) maps to the EC2 server IP.
+For day-to-day operations, SSH commands, container log streaming, manual backups, and SSL renewals, refer directly to:
+👉 **[HANDOVER.md](HANDOVER.md)**
 
 ---
 
-## AWS Migration Guide
+## 📄 License
 
-The platform is designed cloud-ready for seamless AWS scaling:
-
-1. **Storage (AWS S3)**: Change `STORAGE_TYPE=s3` in `backend/.env` and supply `AWS_BUCKET_NAME`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`.
-2. **Database (AWS RDS)**: Update `DB_HOST` in `backend/.env` to point to an Amazon RDS PostgreSQL endpoint.
-3. **Container Hosting (AWS ECS/ECR)**: Push Docker images to ECR and run services on Fargate or ECS clusters.
-4. **CDN (AWS CloudFront)**: Route static assets and download streams through CloudFront distributions.
-
----
-
-## License
-
-MIT © Document Vault
+Distributed under the **MIT License**. See `LICENSE` for details.
