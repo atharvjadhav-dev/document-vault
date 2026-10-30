@@ -44,4 +44,9 @@ jobs:
             echo "📋 Checking container status..."
             docker compose ps
 
-            echo "✅ Deployment completed successfully."
+            echo "🩺 Verifying container health..."
+            sleep 5
+            curl -fsS http://127.0.0.1:5000/api/health || (echo "❌ Backend healthcheck failed!" && exit 1)
+            curl -fsS http://127.0.0.1:5173/ > /dev/null || (echo "❌ Frontend healthcheck failed!" && exit 1)
+
+            echo "✅ Deployment and healthcheck verification completed successfully."

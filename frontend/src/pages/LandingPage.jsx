@@ -14,7 +14,7 @@ const ARCHITECTURE_TABS = [
     badge: 'AWS EC2 + Host NGINX',
     title: 'Dual-Layer Ingress & SSL Termination',
     description:
-      'Incoming HTTPS traffic on document-vault.atharvjadhav.xyz resolves to AWS EC2 in Mumbai (ap-south-1). The host NGINX proxy terminates TLS 1.3 with Let’s Encrypt certificates, enforces 301 HTTPS redirection, and reverse-proxies requests into isolated Docker Compose bridge networks.',
+      'Incoming HTTPS traffic on doc.atharvjadhav.xyz resolves to AWS EC2 in Mumbai (ap-south-1). The host NGINX proxy terminates TLS 1.3 with Let’s Encrypt certificates, enforces 301 HTTPS redirection, and reverse-proxies requests into isolated Docker Compose bridge networks.',
     points: [
       'Port 80 automatically upgraded to Port 443 with HSTS headers',
       'Reverse proxy routing: "/" to React Vite (5173) and "/api/" to Express (5000)',
@@ -391,7 +391,7 @@ const LandingPage = () => {
                 <svg className="w-3 h-3 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                <span className="font-mono tracking-tight font-medium text-[10.5px]">document-vault.atharvjadhav.xyz</span>
+                <span className="font-mono tracking-tight font-medium text-[10.5px]">doc.atharvjadhav.xyz</span>
               </div>
               <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hidden sm:flex items-center gap-1">
                 <span>TLS 1.3</span>
@@ -644,7 +644,7 @@ const LandingPage = () => {
 {`# NGINX Host Ingress
 server {
   listen 443 ssl http2;
-  server_name document-vault.atharvjadhav.xyz;
+  server_name doc.atharvjadhav.xyz document-vault.atharvjadhav.xyz;
 
   ssl_certificate /etc/letsencrypt/live/...;
   

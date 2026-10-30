@@ -11,8 +11,8 @@
 
 A production-grade, secure cloud document vault built with **React 18**, **Node.js Express**, **PostgreSQL 15**, and **AWS S3** — fully containerized with **Docker Compose**, protected by **deep magic-byte malware detection**, and deployed live on **AWS EC2** with automated **GitHub Actions CI/CD**.
 
-🌐 **Live Website**: [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)  
-🩺 **API Healthcheck**: [https://document-vault.atharvjadhav.xyz/api/health](https://document-vault.atharvjadhav.xyz/api/health)  
+🌐 **Live Website**: [https://doc.atharvjadhav.xyz](https://doc.atharvjadhav.xyz) (Legacy: [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz))  
+🩺 **API Healthcheck**: [https://doc.atharvjadhav.xyz/api/health](https://doc.atharvjadhav.xyz/api/health)  
 📖 **DevOps Runbook & Handover**: [HANDOVER.md](HANDOVER.md)
 
 ---
@@ -42,7 +42,8 @@ A production-grade, secure cloud document vault built with **React 18**, **Node.
                                            │ HTTPS (Port 443) / HTTP (Port 80)
                                            ▼
                        ┌───────────────────────────────────────┐
-                       │            Hostinger DNS              │
+                       │          AWS Route 53 DNS             │
+                       │   doc.atharvjadhav.xyz (primary)      │
                        │   document-vault.atharvjadhav.xyz     │
                        └───────────────────┬───────────────────┘
                                            │ (Resolves to 65.1.139.188)
@@ -97,7 +98,7 @@ A production-grade, secure cloud document vault built with **React 18**, **Node.
 
 ## ✨ Key Features
 
-- 🌐 **Custom Domain & HTTPS Ingress** — Live at `document-vault.atharvjadhav.xyz` with automated Let's Encrypt SSL certificates.
+- 🌐 **Custom Domain & HTTPS Ingress** — Live at `doc.atharvjadhav.xyz` (with `document-vault.atharvjadhav.xyz` alias) with automated Let's Encrypt SSL certificates.
 - 🛡️ **Zero-Trust Magic-Byte Inspection** — Validates true binary signatures (initial 512 bytes on disk). Rejects and immediately deletes disguised Windows executables (`MZ`), Linux ELF binaries, shell scripts, and Java bytecode.
 - 🗄️ **Automated S3 Disaster Recovery** — Nightly cron job dumps PostgreSQL, compresses with gzip, and streams snapshots to AWS S3 with automated 30-day retention pruning.
 - 📁 **Complete Document Lifecycle** — Upload, view, download, rename, recategorize, and delete documents with instant search and category filtering.
@@ -219,7 +220,7 @@ docker compose up -d --build
 | `AWS_BUCKET_NAME` | AWS S3 bucket name | `document-vault-files` |
 | `AWS_ACCESS_KEY_ID` | AWS IAM Access Key | `[REDACTED_IAM_KEY]` |
 | `AWS_SECRET_ACCESS_KEY` | AWS IAM Secret Key | `[REDACTED_IAM_SECRET]` |
-| `CORS_ORIGIN` | Allowed client origin | `https://document-vault.atharvjadhav.xyz` |
+| `CORS_ORIGIN` | Allowed client origin | `https://doc.atharvjadhav.xyz,https://document-vault.atharvjadhav.xyz` |
 | `RATE_LIMIT_WINDOW_MS` | Rate limit timeframe in ms | `900000` (15 mins) |
 | `RATE_LIMIT_MAX` | Global max requests per IP | `100` |
 | `AUTH_RATE_LIMIT_MAX` | Max auth attempts per IP | `10` |
@@ -234,7 +235,7 @@ docker compose up -d --build
 
 ## 📡 API Documentation
 
-**Base Production URL**: `https://document-vault.atharvjadhav.xyz/api`
+**Base Production URL**: `https://doc.atharvjadhav.xyz/api`
 
 ### 1. System & Authentication
 

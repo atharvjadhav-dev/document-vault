@@ -21,10 +21,48 @@ const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
 const STORAGE_TYPE = process.env.STORAGE_TYPE || 'local';
 const UPLOAD_PATH = process.env.UPLOAD_PATH || './uploads';
-const s3 =
-  STORAGE_TYPE === 's3'
-    ? new S3Client({ region: process.env.AWS_REGION })
-    : null;
+
+/**
+ * Initialize S3 client using the AWS SDK v3 default credential provider chain.
+ * When deployed on AWS EC2, credentials are automatically resolved from the
+ * EC2 IAM Instance Profile / IMDS. Explicit access keys are never required.
+ * For local offline development, static credentials can be optionally supplied.
+ */
+const initS3Client = () => {
+  if (STORAGE_TYPE !== 's3') {
+    return null;
+  }
+
+  const s3Config = {
+    region: process.env.AWS_REGION || 'ap-south-1',
+  };
+
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID?.trim();
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY?.trim();
+
+  // Clean up placeholder or empty credentials so they never block IMDS resolution
+  if (accessKeyId && (accessKeyId.startsWith('YOUR_') || accessKeyId === '')) {
+    delete process.env.AWS_ACCESS_KEY_ID;
+  }
+  if (secretAccessKey && (secretAccessKey.startsWith('YOUR_') || secretAccessKey === '')) {
+    delete process.env.AWS_SECRET_ACCESS_KEY;
+  }
+
+  // If real static credentials are provided (e.g. local dev outside AWS), pass them explicitly
+  if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    s3Config.credentials = {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    };
+    logger.info('S3 Client initialized with explicit credentials (development mode)');
+  } else {
+    logger.info('S3 Client initialized using AWS SDK default credential provider chain (EC2 IAM Instance Profile)');
+  }
+
+  return new S3Client(s3Config);
+};
+
+const s3 = initS3Client();
 
 // Ensure upload directory exists (local storage)
 if (STORAGE_TYPE === 'local') {

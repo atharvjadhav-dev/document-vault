@@ -11,10 +11,24 @@ BACKUP_FILE="${BACKUP_DIR}/vault_db_${TIMESTAMP}.sql.gz"
 
 mkdir -p "${BACKUP_DIR}"
 
+DB_USER="${DB_USER:-vault_user}"
+DB_NAME="${DB_NAME:-document_vault}"
+DB_PORT="${DB_PORT:-5432}"
+DB_HOST="${DB_HOST:-}"
+
 echo "[$(date)] Starting Document Vault PostgreSQL backup..."
 
-# 1. Dump database from running Postgres container
-docker exec vault_postgres pg_dump -U vault_user -d document_vault | gzip > "${BACKUP_FILE}"
+# 1. Dump database from RDS or running Postgres container
+if [ -n "${DB_HOST}" ] && [ "${DB_HOST}" != "localhost" ] && [ "${DB_HOST}" != "127.0.0.1" ] && [ "${DB_HOST}" != "postgres" ]; then
+  echo "[$(date)] Performing pg_dump from remote/RDS database host (${DB_HOST})..."
+  PGPASSWORD="${DB_PASSWORD}" pg_dump -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" | gzip > "${BACKUP_FILE}"
+elif docker ps --format '{{.Names}}' 2>/dev/null | grep -q "^vault_postgres$"; then
+  echo "[$(date)] Performing pg_dump from vault_postgres container..."
+  docker exec vault_postgres pg_dump -U "${DB_USER}" -d "${DB_NAME}" | gzip > "${BACKUP_FILE}"
+else
+  echo "[$(date)] Performing pg_dump from host (${DB_HOST:-localhost})..."
+  PGPASSWORD="${DB_PASSWORD}" pg_dump -h "${DB_HOST:-localhost}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}" | gzip > "${BACKUP_FILE}"
+fi
 
 BACKUP_SIZE=$(du -h "${BACKUP_FILE}" | cut -f1)
 echo "[$(date)] Database dumped and compressed successfully (${BACKUP_SIZE})"
@@ -22,10 +36,17 @@ echo "[$(date)] Database dumped and compressed successfully (${BACKUP_SIZE})"
 # 2. Transfer dump into backend container to utilize AWS SDK & credentials
 docker cp "${BACKUP_FILE}" vault_backend:/tmp/backup.sql.gz
 
-# 3. Stream backup to AWS S3 bucket
+# 3. Stream backup to AWS S3 bucket (relies on EC2 IAM Instance Profile / AWS SDK credential chain)
 docker exec -i vault_backend node -e "
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const fs = require('fs');
+
+if (process.env.AWS_ACCESS_KEY_ID && (process.env.AWS_ACCESS_KEY_ID.startsWith('YOUR_') || process.env.AWS_ACCESS_KEY_ID.trim() === '')) {
+  delete process.env.AWS_ACCESS_KEY_ID;
+}
+if (process.env.AWS_SECRET_ACCESS_KEY && (process.env.AWS_SECRET_ACCESS_KEY.startsWith('YOUR_') || process.env.AWS_SECRET_ACCESS_KEY.trim() === '')) {
+  delete process.env.AWS_SECRET_ACCESS_KEY;
+}
 
 async function upload() {
   const client = new S3Client({

@@ -12,10 +12,10 @@ This document serves as the master operational source of truth. Any developer or
 
 | Attribute | Value / Location |
 | :--- | :--- |
-| **Live Application URL** | [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz) |
-| **Live API Healthcheck** | [https://document-vault.atharvjadhav.xyz/api/health](https://document-vault.atharvjadhav.xyz/api/health) |
+| **Live Application URL** | [https://doc.atharvjadhav.xyz](https://doc.atharvjadhav.xyz) (Alias: [https://document-vault.atharvjadhav.xyz](https://document-vault.atharvjadhav.xyz)) |
+| **Live API Healthcheck** | [https://doc.atharvjadhav.xyz/api/health](https://doc.atharvjadhav.xyz/api/health) |
 | **AWS EC2 Public IP** | `65.1.139.188` (Region: `ap-south-1` / Mumbai) |
-| **Hostinger DNS Record** | `A` record: `document-vault` ➔ `65.1.139.188` (TTL: 300s) |
+| **AWS Route 53 Records** | `A` records: `doc` & `document-vault` ➔ `65.1.139.188` (TTL: 300s) |
 | **EC2 SSH Access** | User: `ubuntu` \| Key: `doc-vault.pem` |
 | **AWS S3 Bucket** | `document-vault-files` (Region: `ap-south-1`) |
 | **GitHub Repository** | `https://github.com/atharvjadhav-dev/document-vault.git` (`main` branch) |
@@ -29,7 +29,7 @@ This document serves as the master operational source of truth. Any developer or
 [User Browser]
       │
       ▼ (HTTPS:443 / HTTP:80)
-[Hostinger DNS: document-vault.atharvjadhav.xyz]
+[Route 53 DNS: doc.atharvjadhav.xyz & document-vault.atharvjadhav.xyz]
       │
       ▼ (Resolves to 65.1.139.188)
 [AWS EC2 Host OS (Ubuntu 22.04)]

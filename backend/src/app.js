@@ -61,13 +61,29 @@ app.use('/api', rateLimit({
 }));
 
 // ── Health Check ──────────────────────────────────────────────────────────────
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    const { pool } = require('./config/database');
+    await pool.query('SELECT 1');
+
+    res.json({
+      success: true,
+      status: 'healthy',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+    });
+  } catch (error) {
+    logger.error('Database health check failed', { error: error.message });
+    res.status(503).json({
+      success: false,
+      status: 'unhealthy',
+      database: 'disconnected',
+      error: 'Database connection check failed',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+    });
+  }
 });
 
 // ── API Routes ────────────────────────────────────────────────────────────────
