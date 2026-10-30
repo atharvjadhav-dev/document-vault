@@ -6,7 +6,7 @@ export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
     const stored = localStorage.getItem('vault_theme');
     if (stored) return stored === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return true;
   });
 
   useEffect(() => {
